@@ -1,0 +1,23 @@
+# Maven target folder
+target/
+
+# Logs
+*.log
+
+# IntelliJ IDEA
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# VS Code
+.vscode/
+
+# macOS
+.DS_Store
+
+# Local Spring configs (don’t push secrets)
+src/main/resources/application.properties
+
+# Optional: ignore HELP.md if you don’t want it in repo
+HELP.md
