@@ -6,9 +6,14 @@ import com.tripapi.dto.Destination.DestinationResponseDTO;
 import java.util.List;
 
 public interface DestinationService {
-    DestinationResponseDTO create(DestinationRequestDTO request);
-    DestinationResponseDTO getById(Long id);
-    List<DestinationResponseDTO> list(String country, String search);
-    DestinationResponseDTO update(Long id, DestinationRequestDTO request);
+
+    List<DestinationResponseDTO> findAll(); // optional filters
+
+    DestinationResponseDTO findById(Long id);
+
+    DestinationResponseDTO create(DestinationRequestDTO dto);
+
+    DestinationResponseDTO update(Long id, DestinationRequestDTO dto);
+
     void delete(Long id);
 }

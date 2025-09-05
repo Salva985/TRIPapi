@@ -8,8 +8,8 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 public interface DestinationRepository extends JpaRepository<Destination, Long> {
-
-    @Query("""
+}
+ /*   @Query("""
            SELECT d FROM Destination d
            WHERE LOWER(d.country) = LOWER(:country)
            ORDER BY d.city ASC
@@ -22,5 +22,4 @@ public interface DestinationRepository extends JpaRepository<Destination, Long> 
               OR LOWER(d.country) LIKE LOWER(CONCAT('%', :search, '%'))
            ORDER BY d.city ASC
            """)
-    List<Destination> searchByCityOrCountry(@Param("search") String search);
-}
+    List<Destination> searchByCityOrCountry(@Param("search") String search);/*
