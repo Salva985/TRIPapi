@@ -1,5 +1,6 @@
 package com.tripapi.dto.Trip;
 
+import com.tripapi.enums.TripType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -21,6 +22,8 @@ public class TripResponseDTO {
     private Long destinationId;
     private String destinationCity;
     private String destinationCountry;
+
+    private TripType tripType;
 
     private String notes;
 }

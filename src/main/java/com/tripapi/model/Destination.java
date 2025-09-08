@@ -1,7 +1,9 @@
 package com.tripapi.model;
 
+import com.tripapi.enums.CurrencyCode;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -31,7 +33,8 @@ public class Destination {
     @Column(nullable = false, length = 60)
     private String timezone;
 
-    @NotBlank(message = "Currency code is required")
-    @Column(nullable = false, length = 10)
-    private String currencyCode;
+    @NotNull(message = "Currency code is required")
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 3)
+    private CurrencyCode currencyCode;
 }

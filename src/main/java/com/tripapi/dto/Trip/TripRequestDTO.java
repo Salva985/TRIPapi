@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import com.tripapi.enums.TripType;
 
 import java.time.LocalDate;
 
@@ -26,6 +27,8 @@ public class TripRequestDTO {
 
     @NotNull(message = "Destination id is required")
     private Long destinationId;
+
+    private TripType tripType;
 
     private String notes;
 }

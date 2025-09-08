@@ -47,6 +47,7 @@ public class TripServiceImpl implements TripService {
                 .endDate(dto.getEndDate())
                 .destination(destRef)
                 .notes(dto.getNotes())
+                .tripType(dto.getTripType())
                 .build();
 
         return toDTO(tripRepository.save(entity));
@@ -66,6 +67,7 @@ public class TripServiceImpl implements TripService {
         t.setEndDate(dto.getEndDate());
         t.setDestination(destRef);
         t.setNotes(dto.getNotes());
+        t.setTripType(dto.getTripType());
 
         return toDTO(tripRepository.save(t));
     }
@@ -89,6 +91,7 @@ public class TripServiceImpl implements TripService {
                 .destinationCity(t.getDestination().getCity())
                 .destinationCountry(t.getDestination().getCountry())
                 .notes(t.getNotes())
+                .tripType(t.getTripType())
                 .build();
     }
 

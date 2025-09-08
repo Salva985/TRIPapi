@@ -10,6 +10,8 @@ import com.tripapi.service.interfaces.BudgetService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.tripapi.enums.BudgetCategory;
+
 import java.util.List;
 
 @Service
@@ -46,6 +48,7 @@ public class BudgetServiceImpl implements BudgetService {
                 .plannedAmount(dto.getPlannedAmount())
                 .spentAmount(dto.getPlannedAmount())
                 .currencyCode(dto.getCurrencyCode())
+                .category(dto.getCategory())
                 .notes(dto.getNotes())
                 .build();
 
@@ -64,6 +67,7 @@ public class BudgetServiceImpl implements BudgetService {
         b.setPlannedAmount(dto.getPlannedAmount());
         b.setSpentAmount(dto.getSpentAmount());
         b.setCurrencyCode(dto.getCurrencyCode());
+        b.setCategory(dto.getCategory());
         b.setNotes(dto.getNotes());
 
         return toDTO(budgetRepository.save(b));
@@ -86,6 +90,7 @@ public class BudgetServiceImpl implements BudgetService {
                 b.getPlannedAmount(),
                 b.getSpentAmount(),
                 b.getCurrencyCode(),
+                b.getCategory(),
                 b.getNotes()
         );
     }

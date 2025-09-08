@@ -1,5 +1,6 @@
 package com.tripapi.dto.Destination;
 
+import com.tripapi.enums.CurrencyCode;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,5 +15,5 @@ public class DestinationResponseDTO {
     private String city;
     private String country;
     private String timezone;
-    private String currencyCode;
+    private CurrencyCode currencyCode;
 }

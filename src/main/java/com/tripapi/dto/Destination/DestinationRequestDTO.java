@@ -1,6 +1,8 @@
 package com.tripapi.dto.Destination;
 
+import com.tripapi.enums.CurrencyCode;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -21,6 +23,6 @@ public class DestinationRequestDTO {
     @NotBlank(message = "Timezone is required")
     private String timezone;
 
-    @NotBlank(message = "Currency code is required")
-    private String currencyCode;
+    @NotNull(message = "Currency code is required")
+    private CurrencyCode currencyCode;
 }

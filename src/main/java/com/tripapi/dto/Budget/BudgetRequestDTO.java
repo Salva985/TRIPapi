@@ -7,6 +7,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import com.tripapi.enums.BudgetCategory;
+
 import java.math.BigDecimal;
 
 @Data
@@ -27,6 +29,9 @@ public class BudgetRequestDTO {
 
     @NotNull(message = "Currency code is required")
     private String currencyCode; //  "EUR", "USD"
+
+    @NotNull(message = "Category is required")
+    private BudgetCategory category;
 
     private String notes;
 }

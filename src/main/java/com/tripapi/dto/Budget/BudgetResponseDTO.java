@@ -1,11 +1,11 @@
 package com.tripapi.dto.Budget;
 
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.PositiveOrZero;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import com.tripapi.enums.BudgetCategory;
 
 import java.math.BigDecimal;
 
@@ -23,6 +23,7 @@ public class BudgetResponseDTO {
     private BigDecimal plannedAmount;
     private BigDecimal spentAmount;
     private String currencyCode; //  "EUR", "USD"
+    private BudgetCategory category;
 
     private String notes;
 }

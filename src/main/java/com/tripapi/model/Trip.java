@@ -8,6 +8,10 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import com.tripapi.enums.TripType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.EnumType;
+
 import java.time.LocalDate;
 
 @Data
@@ -37,6 +41,10 @@ public class Trip {
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "destination_id", nullable = false)
     private Destination destination;
+
+    @Enumerated(EnumType.STRING)
+    @Column(length = 20)
+    private TripType tripType;
     
     @Column(length = 500)
     private String notes;
