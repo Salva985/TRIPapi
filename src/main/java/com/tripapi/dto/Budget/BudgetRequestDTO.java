@@ -1,5 +1,6 @@
 package com.tripapi.dto.Budget;
 
+import com.tripapi.enums.CurrencyCode;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
 import lombok.AllArgsConstructor;
@@ -28,7 +29,7 @@ public class BudgetRequestDTO {
     private BigDecimal spentAmount;
 
     @NotNull(message = "Currency code is required")
-    private String currencyCode; //  "EUR", "USD"
+    private CurrencyCode currencyCode; //  "EUR", "USD"
 
     @NotNull(message = "Category is required")
     private BudgetCategory category;

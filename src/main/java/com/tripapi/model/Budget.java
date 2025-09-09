@@ -1,6 +1,7 @@
 package com.tripapi.model;
 
 import com.tripapi.enums.BudgetCategory;
+import com.tripapi.enums.CurrencyCode;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 
@@ -42,7 +43,7 @@ public class Budget {
 
     @NotNull(message = "Currency code is required")
     @Column(name = "currency_code", nullable = false, length = 3)
-    private String currencyCode; // "EUR", "USD"
+    private CurrencyCode currencyCode; // "EUR", "USD"
 
     @NotNull(message = "Category is required")
     @Enumerated(EnumType.STRING)

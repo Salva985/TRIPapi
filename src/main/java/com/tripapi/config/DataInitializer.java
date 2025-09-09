@@ -51,7 +51,7 @@ public class DataInitializer implements CommandLineRunner {
                 .city("Barcelona")
                 .country("Spain")
                 .timezone("Europe/Madrid")
-                .currencyCode(CurrencyCode.EUR)   // <— enum, not "EUR"
+                .currencyCode(CurrencyCode.EUR)
                 .build();
 
         Destination rome = Destination.builder()
@@ -112,7 +112,7 @@ public class DataInitializer implements CommandLineRunner {
                 .category(BudgetCategory.TRANSPORT)
                 .plannedAmount(new BigDecimal("800.00"))
                 .spentAmount(new BigDecimal("760.45"))
-                .currencyCode(String.valueOf(CurrencyCode.EUR))
+                .currencyCode(CurrencyCode.EUR)
                 .notes("Round trip flights")
                 .build();
 
@@ -121,7 +121,7 @@ public class DataInitializer implements CommandLineRunner {
                 .category(BudgetCategory.FOOD)
                 .plannedAmount(new BigDecimal("350.00"))
                 .spentAmount(new BigDecimal("90.00"))
-                .currencyCode(String.valueOf(CurrencyCode.EUR))
+                .currencyCode(CurrencyCode.EUR)
                 .notes("Tapas + paella budget")
                 .build();
 
@@ -133,7 +133,7 @@ public class DataInitializer implements CommandLineRunner {
                 .trip(summer)
                 .title("Sagrada Família Tour")
                 .date(LocalDate.of(2025, 7, 4))
-                .description("Pre-book tickets")
+                .notes("Pre-book tickets")
                 .landmarkName("Sagrada Família")
                 .location("Barcelona")
                 .build();
@@ -142,7 +142,7 @@ public class DataInitializer implements CommandLineRunner {
                 .trip(summer)
                 .title("Kayak in Costa Brava")
                 .date(LocalDate.of(2025, 7, 6))
-                .description("Bring sunscreen")
+                .notes("Bring sunscreen")
                 .difficultyLevel("LOW")
                 .equipmentRequired("Life vest")
                 .build();

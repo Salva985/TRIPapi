@@ -1,5 +1,6 @@
 package com.tripapi.dto.Budget;
 
+import com.tripapi.enums.CurrencyCode;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -22,7 +23,7 @@ public class BudgetResponseDTO {
 
     private BigDecimal plannedAmount;
     private BigDecimal spentAmount;
-    private String currencyCode; //  "EUR", "USD"
+    private CurrencyCode currencyCode; //  "EUR", "USD"
     private BudgetCategory category;
 
     private String notes;

@@ -26,7 +26,7 @@ public class Trip {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank
+    @NotBlank(message = "Trip name is required")
     @Column(nullable = false, length = 120)
     private String name;
 

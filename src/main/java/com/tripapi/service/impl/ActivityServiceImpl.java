@@ -45,7 +45,7 @@ public class ActivityServiceImpl implements ActivityService {
         entity.setTrip(tripRef);
         entity.setDate(dto.getDate());
         entity.setTitle(dto.getTitle());
-        entity.setDescription(dto.getDescription());
+        entity.setNotes(dto.getDescription());
         // subtype fields
         applySubtypeFields(entity, dto);
 
@@ -70,7 +70,7 @@ public class ActivityServiceImpl implements ActivityService {
         a.setTrip(tripRef);
         a.setDate(dto.getDate());
         a.setTitle(dto.getTitle());
-        a.setDescription(dto.getDescription());
+        a.setNotes(dto.getDescription());
         // subtype fields
         applySubtypeFields(a, dto);
 
@@ -125,7 +125,7 @@ public class ActivityServiceImpl implements ActivityService {
                 .tripName(a.getTrip().getName())
                 .date(a.getDate())
                 .title(a.getTitle())
-                .description(a.getDescription())
+                .description(a.getNotes())
                 .type(typeOf(a));
 
         if (a instanceof ActivitySightseeing s) {
