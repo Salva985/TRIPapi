@@ -137,6 +137,7 @@ public class DataInitializer implements CommandLineRunner {
                 .landmarkName("Sagrada Família")
                 .location("Barcelona")
                 .build();
+        sagrada.setType(ActivityType.SIGHTSEEING);
 
         ActivityAdventure kayak = ActivityAdventure.builder()
                 .trip(summer)
@@ -146,6 +147,7 @@ public class DataInitializer implements CommandLineRunner {
                 .difficultyLevel("LOW")
                 .equipmentRequired("Life vest")
                 .build();
+        kayak.setType(ActivityType.ADVENTURE);
 
         activityRepository.save(sagrada);
         activityRepository.save(kayak);

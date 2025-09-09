@@ -1,5 +1,6 @@
 package com.tripapi.dto.Activity;
 
+import com.tripapi.enums.ActivityType;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -24,13 +25,13 @@ public class ActivityRequestDTO {
     @NotBlank(message = "Title is required")
     private String title;
 
-    private String description;
+    private String notes;
 
     /**
      * Allowed: SIGHTSEEING, ADVENTURE, CULTURAL
      */
     @NotBlank(message = "Type is required")
-    private String type;
+    private ActivityType type;
 
     // ----- Subtype-(optional) -----
     // SIGHTSEEING

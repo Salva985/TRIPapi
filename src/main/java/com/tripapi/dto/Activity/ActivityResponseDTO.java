@@ -1,5 +1,6 @@
 package com.tripapi.dto.Activity;
 
+import com.tripapi.enums.ActivityType;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -16,12 +17,12 @@ public class ActivityResponseDTO {
 
     private LocalDate date;
     private String title;
-    private String description;
+    private String notes;
 
     /**
      * SIGHTSEEING / ADVENTURE / CULTURAL
      */
-    private String type;
+    private ActivityType type;
 
     // ----- Subtype-(nullable) -----
     // SIGHTSEEING

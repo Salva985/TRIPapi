@@ -1,5 +1,6 @@
 package com.tripapi.model;
 
+import com.tripapi.enums.ActivityType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -39,4 +40,9 @@ public class Activity {
 
     @Column(length = 1000)
     private String notes;
+
+    @NotNull(message = "Type is required")
+    @Enumerated(EnumType.STRING)
+    @Column(name = "type", nullable = false, length = 20)
+    private ActivityType type;
 }

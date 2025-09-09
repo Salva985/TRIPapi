@@ -2,6 +2,7 @@ package com.tripapi.service.impl;
 
 import com.tripapi.dto.Activity.ActivityRequestDTO;
 import com.tripapi.dto.Activity.ActivityResponseDTO;
+import com.tripapi.enums.ActivityType;
 import com.tripapi.model.*;
 import com.tripapi.repository.ActivityRepository;
 import com.tripapi.repository.TripRepository;
@@ -45,7 +46,9 @@ public class ActivityServiceImpl implements ActivityService {
         entity.setTrip(tripRef);
         entity.setDate(dto.getDate());
         entity.setTitle(dto.getTitle());
-        entity.setNotes(dto.getDescription());
+        entity.setNotes(dto.getNotes());
+        entity.setType(dto.getType());
+
         // subtype fields
         applySubtypeFields(entity, dto);
 
@@ -57,9 +60,8 @@ public class ActivityServiceImpl implements ActivityService {
         Activity a = activityRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Activity not found with ID: " + id));
 
-        // do not allow changing the subtype to keep it simple & stable
-        String currentType = typeOf(a);
-        if (!currentType.equalsIgnoreCase(dto.getType())) {
+        // do not allow changing the subtype (and therefore the type enum)
+        if (a.getType() != dto.getType()) {
             throw new BadRequestException("Changing activity type is not supported. Delete and create a new activity.");
         }
 
@@ -70,7 +72,8 @@ public class ActivityServiceImpl implements ActivityService {
         a.setTrip(tripRef);
         a.setDate(dto.getDate());
         a.setTitle(dto.getTitle());
-        a.setNotes(dto.getDescription());
+        a.setNotes(dto.getNotes()); // ✅ was description before
+
         // subtype fields
         applySubtypeFields(a, dto);
 
@@ -87,14 +90,14 @@ public class ActivityServiceImpl implements ActivityService {
 
     // -------- helpers --------
 
-    private Activity buildSubclass(String typeRaw) {
-        String t = typeRaw == null ? "" : typeRaw.trim().toUpperCase();
-        return switch (t) {
-            case "SIGHTSEEING" -> new ActivitySightseeing();
-            case "ADVENTURE"   -> new ActivityAdventure();
-            case "CULTURAL"    -> new ActivityCultural();
-            default -> throw new BadRequestException("Unknown activity type: " + typeRaw +
-                    " (allowed: SIGHTSEEING, ADVENTURE, CULTURAL)");
+    private Activity buildSubclass(ActivityType type) {
+        if (type == null) {
+            throw new BadRequestException("Type is required (SIGHTSEEING, ADVENTURE, CULTURAL).");
+        }
+        return switch (type) {
+            case SIGHTSEEING -> new ActivitySightseeing();
+            case ADVENTURE   -> new ActivityAdventure();
+            case CULTURAL    -> new ActivityCultural();
         };
     }
 
@@ -111,13 +114,6 @@ public class ActivityServiceImpl implements ActivityService {
         }
     }
 
-    private String typeOf(Activity a) {
-        if (a instanceof ActivitySightseeing) return "SIGHTSEEING";
-        if (a instanceof ActivityAdventure)   return "ADVENTURE";
-        if (a instanceof ActivityCultural)    return "CULTURAL";
-        return "UNKNOWN";
-    }
-
     private ActivityResponseDTO toDTO(Activity a) {
         ActivityResponseDTO.ActivityResponseDTOBuilder b = ActivityResponseDTO.builder()
                 .id(a.getId())
@@ -125,8 +121,8 @@ public class ActivityServiceImpl implements ActivityService {
                 .tripName(a.getTrip().getName())
                 .date(a.getDate())
                 .title(a.getTitle())
-                .description(a.getNotes())
-                .type(typeOf(a));
+                .notes(a.getNotes())
+                .type(a.getType());
 
         if (a instanceof ActivitySightseeing s) {
             b.landmarkName(s.getLandmarkName())
