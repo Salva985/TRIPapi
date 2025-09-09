@@ -30,7 +30,7 @@ public class ActivityRequestDTO {
     /**
      * Allowed: SIGHTSEEING, ADVENTURE, CULTURAL
      */
-    @NotBlank(message = "Type is required")
+    @NotNull
     private ActivityType type;
 
     // ----- Subtype-(optional) -----

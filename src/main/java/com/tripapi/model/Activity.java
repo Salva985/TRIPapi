@@ -43,6 +43,6 @@ public class Activity {
 
     @NotNull(message = "Type is required")
     @Enumerated(EnumType.STRING)
-    @Column(name = "type", nullable = false, length = 20)
+    @Column(nullable = false, length = 20)
     private ActivityType type;
 }

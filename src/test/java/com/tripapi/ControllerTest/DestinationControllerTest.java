@@ -1,0 +1,209 @@
+/* package com.tripapi;
+
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.tripapi.controller.DestinationController;
+import com.tripapi.dto.Destination.DestinationRequestDTO;
+import com.tripapi.dto.Destination.DestinationResponseDTO;
+import com.tripapi.enums.CurrencyCode;
+import com.tripapi.service.interfaces.DestinationService;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+@WebMvcTest(DestinationController.class)
+class DestinationControllerTest {
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    @MockBean
+    private DestinationService destinationService;
+
+    @Test
+    void testCreateDestination() throws Exception {
+        // --- Request DTO ---
+        DestinationRequestDTO request = DestinationRequestDTO.builder()
+                .city("Barcelona")
+                .country("Spain")
+                .currencyCode(CurrencyCode.EUR)
+                .timezone("Europe/Madrid")
+                .build();
+
+        // --- Response DTO (mocked return from service) ---
+        DestinationResponseDTO response = DestinationResponseDTO.builder()
+                .id(1L)
+                .city("Barcelona")
+                .country("Spain")
+                .currencyCode(CurrencyCode.EUR)
+                .timezone("Europe/Madrid")
+                .build();
+
+        Mockito.when(destinationService.create(any(DestinationRequestDTO.class)))
+                .thenReturn(response);
+
+        // --- Perform POST request ---
+        mockMvc.perform(
+                        post("/api/destinations")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request))
+                )
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.city").value("Barcelona"))
+                .andExpect(jsonPath("$.currencyCode").value("EUR"));
+    }
+}
+ */
+
+package com.tripapi.ControllerTest;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.tripapi.controller.DestinationController;
+import com.tripapi.dto.Destination.DestinationRequestDTO;
+import com.tripapi.dto.Destination.DestinationResponseDTO;
+import com.tripapi.enums.CurrencyCode;
+import com.tripapi.service.interfaces.DestinationService;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+
+import java.util.List;
+
+import static org.hamcrest.Matchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+@ExtendWith(MockitoExtension.class)
+class DestinationControllerTest {
+
+    @Mock
+    private DestinationService destinationService;
+
+    @InjectMocks
+    private DestinationController destinationController;
+
+    private MockMvc mockMvc;
+    private ObjectMapper mapper;
+
+    @BeforeEach
+    void setUp() {
+        mockMvc = MockMvcBuilders
+                .standaloneSetup(destinationController)
+                // .setControllerAdvice(new GlobalExceptionHandler()) // if you have one
+                .build();
+        mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule()); // safe for future LocalDate fields
+    }
+
+    @Test
+    void create_shouldReturn201AndBody() throws Exception {
+        DestinationRequestDTO req = DestinationRequestDTO.builder()
+                .city("Barcelona")
+                .country("Spain")
+                .timezone("Europe/Madrid")
+                .currencyCode(CurrencyCode.EUR)
+                .build();
+
+        DestinationResponseDTO res = DestinationResponseDTO.builder()
+                .id(1L)
+                .city("Barcelona")
+                .country("Spain")
+                .timezone("Europe/Madrid")
+                .currencyCode(CurrencyCode.EUR)
+                .build();
+
+        when(destinationService.create(any(DestinationRequestDTO.class))).thenReturn(res);
+
+
+        mockMvc.perform(post("/api/destinations")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(req)))
+                .andExpect(status().isCreated())
+                .andExpect(header().string("Location", containsString("/api/destinations/1")))
+                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.city").value("Barcelona"))
+                .andExpect(jsonPath("$.currencyCode").value("EUR"));
+
+        verify(destinationService, times(1)).create(any(DestinationRequestDTO.class));
+    }
+
+    @Test
+    void findAll_shouldReturn200AndList() throws Exception {
+        DestinationResponseDTO res = DestinationResponseDTO.builder()
+                .id(1L).city("Rome").country("Italy").timezone("Europe/Rome").currencyCode(CurrencyCode.EUR).build();
+        when(destinationService.findAll()).thenReturn(List.of(res));
+
+        mockMvc.perform(get("/api/destinations"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.size()").value(1))
+                .andExpect(jsonPath("$[0].city").value("Rome"));
+
+        verify(destinationService, times(1)).findAll();
+    }
+
+    @Test
+    void findById_shouldReturn200AndBody() throws Exception {
+        DestinationResponseDTO res = DestinationResponseDTO.builder()
+                .id(42L).city("London").country("UK").timezone("Europe/London").currencyCode(CurrencyCode.GBP).build();
+        when(destinationService.findById(42L)).thenReturn(res);
+
+        mockMvc.perform(get("/api/destinations/{id}", 42L))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(42))
+                .andExpect(jsonPath("$.currencyCode").value("GBP"));
+
+        verify(destinationService).findById(42L);
+    }
+
+    @Test
+    void update_shouldReturn200AndBody() throws Exception {
+        DestinationRequestDTO req = DestinationRequestDTO.builder()
+                .city("Paris").country("France").timezone("Europe/Paris").currencyCode(CurrencyCode.EUR).build();
+
+        DestinationResponseDTO res = DestinationResponseDTO.builder()
+                .id(3L).city("Paris").country("France").timezone("Europe/Paris").currencyCode(CurrencyCode.EUR).build();
+
+        when(destinationService.update(eq(3L), any(DestinationRequestDTO.class))).thenReturn(res);
+
+        mockMvc.perform(put("/api/destinations/{id}", 3L)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(req)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(3))
+                .andExpect(jsonPath("$.city").value("Paris"));
+
+        verify(destinationService).update(eq(3L), any(DestinationRequestDTO.class));
+    }
+
+    @Test
+    void delete_shouldReturn204() throws Exception {
+        doNothing().when(destinationService).delete(9L);
+
+        mockMvc.perform(delete("/api/destinations/{id}", 9L))
+                .andExpect(status().isNoContent());
+
+        verify(destinationService).delete(9L);
+    }
+}

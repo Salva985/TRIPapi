@@ -3,7 +3,11 @@ package com.tripapi.service.impl;
 import com.tripapi.dto.Activity.ActivityRequestDTO;
 import com.tripapi.dto.Activity.ActivityResponseDTO;
 import com.tripapi.enums.ActivityType;
-import com.tripapi.model.*;
+import com.tripapi.model.Activity;
+import com.tripapi.model.ActivityAdventure;
+import com.tripapi.model.ActivityCultural;
+import com.tripapi.model.ActivitySightseeing;
+import com.tripapi.model.Trip;
 import com.tripapi.repository.ActivityRepository;
 import com.tripapi.repository.TripRepository;
 import com.tripapi.service.interfaces.ActivityService;
@@ -41,15 +45,21 @@ public class ActivityServiceImpl implements ActivityService {
         Trip tripRef = tripRepository.findById(dto.getTripId())
                 .orElseThrow(() -> new ResourceNotFoundException("Trip not found with ID: " + dto.getTripId()));
 
-        Activity entity = buildSubclass(dto.getType());
+        ActivityType type = dto.getType();
+        if (type == null) {
+            throw new BadRequestException("Type is required (SIGHTSEEING, ADVENTURE, CULTURAL).");
+        }
+
+        Activity entity = buildSubclass(type);
+
         // common fields
         entity.setTrip(tripRef);
         entity.setDate(dto.getDate());
         entity.setTitle(dto.getTitle());
         entity.setNotes(dto.getNotes());
-        entity.setType(dto.getType());
+        entity.setType(type); // enum stored on base entity
 
-        // subtype fields
+        // subtype-specific fields
         applySubtypeFields(entity, dto);
 
         return toDTO(activityRepository.save(entity));
@@ -60,8 +70,9 @@ public class ActivityServiceImpl implements ActivityService {
         Activity a = activityRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Activity not found with ID: " + id));
 
-        // do not allow changing the subtype (and therefore the type enum)
-        if (a.getType() != dto.getType()) {
+        // keep subtype stable (don’t allow changing type)
+        ActivityType currentType = a.getType();
+        if (dto.getType() != null && dto.getType() != currentType) {
             throw new BadRequestException("Changing activity type is not supported. Delete and create a new activity.");
         }
 
@@ -72,9 +83,9 @@ public class ActivityServiceImpl implements ActivityService {
         a.setTrip(tripRef);
         a.setDate(dto.getDate());
         a.setTitle(dto.getTitle());
-        a.setNotes(dto.getNotes()); // ✅ was description before
+        a.setNotes(dto.getNotes());
 
-        // subtype fields
+        // subtype-specific fields
         applySubtypeFields(a, dto);
 
         return toDTO(activityRepository.save(a));
@@ -91,9 +102,6 @@ public class ActivityServiceImpl implements ActivityService {
     // -------- helpers --------
 
     private Activity buildSubclass(ActivityType type) {
-        if (type == null) {
-            throw new BadRequestException("Type is required (SIGHTSEEING, ADVENTURE, CULTURAL).");
-        }
         return switch (type) {
             case SIGHTSEEING -> new ActivitySightseeing();
             case ADVENTURE   -> new ActivityAdventure();
@@ -122,7 +130,7 @@ public class ActivityServiceImpl implements ActivityService {
                 .date(a.getDate())
                 .title(a.getTitle())
                 .notes(a.getNotes())
-                .type(a.getType());
+                .type(a.getType()); // enum directly
 
         if (a instanceof ActivitySightseeing s) {
             b.landmarkName(s.getLandmarkName())
@@ -137,7 +145,7 @@ public class ActivityServiceImpl implements ActivityService {
         return b.build();
     }
 
-    // Inline exceptions (MarineConservation style)
+
     public static class ResourceNotFoundException extends RuntimeException {
         public ResourceNotFoundException(String message) { super(message); }
     }
