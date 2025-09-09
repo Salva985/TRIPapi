@@ -29,7 +29,7 @@ public class ActivityController {
         return activityService.findById(id);
     }
 
-    @PostMapping("/{id}")
+    @PostMapping
     public ResponseEntity<ActivityResponseDTO> create(@Valid @RequestBody ActivityRequestDTO body) {
         ActivityResponseDTO created = activityService.create(body);
         return ResponseEntity.created(URI.create("/api/activities/" + created.getId()))

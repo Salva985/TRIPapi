@@ -41,7 +41,7 @@ public class Budget {
     private BigDecimal spentAmount;
 
     @NotNull(message = "Currency code is required")
-    @Column(nullable = false, length = 3)
+    @Column(name = "currency_code", nullable = false, length = 3)
     private String currencyCode; // "EUR", "USD"
 
     @NotNull(message = "Category is required")

@@ -4,7 +4,4 @@ public enum CurrencyCode {
     EUR,
     USD,
     GBP,
-    JPY,
-    AUD,
-    CAD
 }
