@@ -1,0 +1,53 @@
+
+{
+  "destinations": [
+    {
+      "city": "Barcelona",
+      "country": "Spain",
+      "timezone": "Europe/Madrid",
+      "currencyCode": "EUR"
+    }
+  ],
+  "trips": [
+    {
+      "name": "Summer Escape",
+      "startDate": "2025-07-01",
+      "endDate": "2025-07-10",
+      "destinationId": 1,
+      "notes": "Family trip"
+    }
+  ],
+  "itineraryDays": [
+    {
+      "tripId": 1,
+      "date": "2025-07-02",
+      "dayNumber": 1,
+      "title": "Arrival and City Walk",
+      "notes": "Evening stroll through Gothic Quarter"
+    }
+  ],
+  "budgets": [
+    {
+      "tripId": 1,
+      "category": "ACCOMMODATION",
+      "plannedAmount": 800.00,
+      "spentAmount": 200.00,
+      "currencyCode": "EUR",
+      "notes": "Hotel booking in Barcelona"
+    }
+  ],
+  "activities": [
+    {
+      "tripId": 1,
+      "type": "SIGHTSEEING",
+      "title": "Sagrada Familia Tour",
+      "date": "2025-07-03",
+      "startTime": "10:00",
+      "endTime": "12:00",
+      "location": "Sagrada Familia, Barcelona",
+      "cost": 28.50,
+      "currencyCode": "EUR",
+      "notes": "Bring camera and water"
+    }
+  ]
+}
