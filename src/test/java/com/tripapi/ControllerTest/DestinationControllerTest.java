@@ -1,72 +1,3 @@
-/* package com.tripapi;
-
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.tripapi.controller.DestinationController;
-import com.tripapi.dto.Destination.DestinationRequestDTO;
-import com.tripapi.dto.Destination.DestinationResponseDTO;
-import com.tripapi.enums.CurrencyCode;
-import com.tripapi.service.interfaces.DestinationService;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
-@WebMvcTest(DestinationController.class)
-class DestinationControllerTest {
-
-    @Autowired
-    private MockMvc mockMvc;
-
-    @Autowired
-    private ObjectMapper objectMapper;
-
-    @MockBean
-    private DestinationService destinationService;
-
-    @Test
-    void testCreateDestination() throws Exception {
-        // --- Request DTO ---
-        DestinationRequestDTO request = DestinationRequestDTO.builder()
-                .city("Barcelona")
-                .country("Spain")
-                .currencyCode(CurrencyCode.EUR)
-                .timezone("Europe/Madrid")
-                .build();
-
-        // --- Response DTO (mocked return from service) ---
-        DestinationResponseDTO response = DestinationResponseDTO.builder()
-                .id(1L)
-                .city("Barcelona")
-                .country("Spain")
-                .currencyCode(CurrencyCode.EUR)
-                .timezone("Europe/Madrid")
-                .build();
-
-        Mockito.when(destinationService.create(any(DestinationRequestDTO.class)))
-                .thenReturn(response);
-
-        // --- Perform POST request ---
-        mockMvc.perform(
-                        post("/api/destinations")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(request))
-                )
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.id").value(1))
-                .andExpect(jsonPath("$.city").value("Barcelona"))
-                .andExpect(jsonPath("$.currencyCode").value("EUR"));
-    }
-}
- */
-
 package com.tripapi.ControllerTest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -111,7 +42,6 @@ class DestinationControllerTest {
     void setUp() {
         mockMvc = MockMvcBuilders
                 .standaloneSetup(destinationController)
-                // .setControllerAdvice(new GlobalExceptionHandler()) // if you have one
                 .build();
         mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule()); // safe for future LocalDate fields
