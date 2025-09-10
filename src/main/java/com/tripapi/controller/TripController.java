@@ -32,9 +32,9 @@ public class TripController {
     }
 
     @PostMapping
-    public ResponseEntity<TripResponseDTO> create(@Valid @RequestBody TripRequestDTO body) {
-        TripResponseDTO created = tripService.create(body);
-        return ResponseEntity.created(URI.create("/api/destinations/" + created.getId())).body(created);
+    public ResponseEntity<TripResponseDTO> create(@Valid @RequestBody TripRequestDTO dto) {
+        TripResponseDTO created = tripService.create(dto);
+        return ResponseEntity.created(URI.create("/api/trips/" + created.getId())).body(created);
     }
 
     @PutMapping("/{id}")

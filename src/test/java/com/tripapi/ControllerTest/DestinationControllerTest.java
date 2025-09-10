@@ -19,7 +19,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.List;
 
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.containsString;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
@@ -28,6 +28,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @ExtendWith(MockitoExtension.class)
 class DestinationControllerTest {
+
+    private static final String BASE = "/api/destinations";
 
     @Mock
     private DestinationService destinationService;
@@ -42,13 +44,13 @@ class DestinationControllerTest {
     void setUp() {
         mockMvc = MockMvcBuilders
                 .standaloneSetup(destinationController)
+                // .setControllerAdvice(new GlobalExceptionHandler()) // if you have one
                 .build();
-        mapper = new ObjectMapper();
-        mapper.registerModule(new JavaTimeModule()); // safe for future LocalDate fields
+        mapper = new ObjectMapper().registerModule(new JavaTimeModule());
     }
 
     @Test
-    void create_shouldReturn201AndBody() throws Exception {
+    void createTest() throws Exception {
         DestinationRequestDTO req = DestinationRequestDTO.builder()
                 .city("Barcelona")
                 .country("Spain")
@@ -66,12 +68,11 @@ class DestinationControllerTest {
 
         when(destinationService.create(any(DestinationRequestDTO.class))).thenReturn(res);
 
-
-        mockMvc.perform(post("/api/destinations")
+        mockMvc.perform(post(BASE)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(req)))
                 .andExpect(status().isCreated())
-                .andExpect(header().string("Location", containsString("/api/destinations/1")))
+                .andExpect(header().string("Location", containsString(BASE + "/1")))
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.city").value("Barcelona"))
                 .andExpect(jsonPath("$.currencyCode").value("EUR"));
@@ -80,12 +81,13 @@ class DestinationControllerTest {
     }
 
     @Test
-    void findAll_shouldReturn200AndList() throws Exception {
+    void findAllTest() throws Exception {
         DestinationResponseDTO res = DestinationResponseDTO.builder()
                 .id(1L).city("Rome").country("Italy").timezone("Europe/Rome").currencyCode(CurrencyCode.EUR).build();
+
         when(destinationService.findAll()).thenReturn(List.of(res));
 
-        mockMvc.perform(get("/api/destinations"))
+        mockMvc.perform(get(BASE))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.size()").value(1))
                 .andExpect(jsonPath("$[0].city").value("Rome"));
@@ -94,12 +96,13 @@ class DestinationControllerTest {
     }
 
     @Test
-    void findById_shouldReturn200AndBody() throws Exception {
+    void findByIdTest() throws Exception {
         DestinationResponseDTO res = DestinationResponseDTO.builder()
                 .id(42L).city("London").country("UK").timezone("Europe/London").currencyCode(CurrencyCode.GBP).build();
+
         when(destinationService.findById(42L)).thenReturn(res);
 
-        mockMvc.perform(get("/api/destinations/{id}", 42L))
+        mockMvc.perform(get(BASE + "/{id}", 42L))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(42))
                 .andExpect(jsonPath("$.currencyCode").value("GBP"));
@@ -108,7 +111,7 @@ class DestinationControllerTest {
     }
 
     @Test
-    void update_shouldReturn200AndBody() throws Exception {
+    void updateTest() throws Exception {
         DestinationRequestDTO req = DestinationRequestDTO.builder()
                 .city("Paris").country("France").timezone("Europe/Paris").currencyCode(CurrencyCode.EUR).build();
 
@@ -117,7 +120,7 @@ class DestinationControllerTest {
 
         when(destinationService.update(eq(3L), any(DestinationRequestDTO.class))).thenReturn(res);
 
-        mockMvc.perform(put("/api/destinations/{id}", 3L)
+        mockMvc.perform(put(BASE + "/{id}", 3L)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(req)))
                 .andExpect(status().isOk())
@@ -128,10 +131,10 @@ class DestinationControllerTest {
     }
 
     @Test
-    void delete_shouldReturn204() throws Exception {
+    void deleteTest() throws Exception {
         doNothing().when(destinationService).delete(9L);
 
-        mockMvc.perform(delete("/api/destinations/{id}", 9L))
+        mockMvc.perform(delete(BASE + "/{id}", 9L))
                 .andExpect(status().isNoContent());
 
         verify(destinationService).delete(9L);

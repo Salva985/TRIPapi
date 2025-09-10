@@ -16,7 +16,7 @@ import java.math.BigDecimal;
 @Builder
 public class BudgetResponseDTO {
 
-    private Long Id;
+    private Long id;
 
     private Long tripId;
     private String tripName;
