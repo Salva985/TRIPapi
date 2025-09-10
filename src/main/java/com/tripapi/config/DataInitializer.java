@@ -64,6 +64,7 @@ public class DataInitializer implements CommandLineRunner {
         destinationRepository.save(barcelona);
         destinationRepository.save(rome);
 
+
         // ---- Trip (ENUM TRIP TYPE) ----
         Trip summer = Trip.builder()
                 .name("Summer Escape")
@@ -85,6 +86,7 @@ public class DataInitializer implements CommandLineRunner {
 
         tripRepository.save(summer);
         tripRepository.save(workTrip);
+
 
         // ---- Itinerary Days ----
         ItineraryDay d1 = ItineraryDay.builder()
@@ -149,7 +151,19 @@ public class DataInitializer implements CommandLineRunner {
                 .build();
         kayak.setType(ActivityType.ADVENTURE);
 
+        ActivityCultural opera = ActivityCultural.builder()
+                .trip(summer)
+                .date(LocalDate.of(2025, 7, 7))
+                .title("Opera Night")
+                .notes("Formal dress code recommended")
+                .type(ActivityType.CULTURAL)
+                .eventName("La Traviata")
+                .organizer("Palau Sant Jordi")
+                .build();
+
+
         activityRepository.save(sagrada);
         activityRepository.save(kayak);
+        activityRepository.save(opera);
     }
 }
