@@ -106,6 +106,7 @@ public class ActivityServiceImpl implements ActivityService {
             case SIGHTSEEING -> new ActivitySightseeing();
             case ADVENTURE   -> new ActivityAdventure();
             case CULTURAL    -> new ActivityCultural();
+            case OTHER    -> new Activity();
         };
     }
 
