@@ -4,4 +4,5 @@ public enum TripType {
     LEISURE,
     BUSINESS,
     ADVENTURE,
+    OTHER,
 }

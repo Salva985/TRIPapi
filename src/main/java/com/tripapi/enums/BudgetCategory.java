@@ -6,5 +6,5 @@ public enum BudgetCategory {
     TRANSPORT,
     ACTIVITIES,
     SHOPPING,
-    OTHER
+    OTHER,
 }

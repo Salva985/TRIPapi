@@ -4,4 +4,5 @@ public enum ActivityType {
     SIGHTSEEING,
     ADVENTURE,
     CULTURAL,
+    OTHER,
 }
