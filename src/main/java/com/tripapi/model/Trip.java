@@ -3,16 +3,15 @@ package com.tripapi.model;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import com.tripapi.enums.TripType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.EnumType;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -48,4 +47,13 @@ public class Trip {
     
     @Column(length = 500)
     private String notes;
+
+    @OneToMany(
+            mappedBy = "trip",
+            cascade = CascadeType.ALL,      // propagate REMOVE to children
+            orphanRemoval = true            // delete rows when parent is removed
+    )
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    private List<Activity> activities = new ArrayList<>();
 }

@@ -7,6 +7,7 @@ import com.tripapi.model.Trip;
 import com.tripapi.repository.DestinationRepository;
 import com.tripapi.repository.TripRepository;
 import com.tripapi.service.interfaces.TripService;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -72,12 +73,12 @@ public class TripServiceImpl implements TripService {
         return toDTO(tripRepository.save(t));
     }
 
+    @Transactional
     @Override
     public void delete(Long id) {
-        if (!tripRepository.existsById(id)) {
-            throw new DestinationServiceImpl.ResourceNotFoundException("Trip not found with ID: " + id);
-        }
-        tripRepository.deleteById(id);
+        Trip trip = tripRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Trip not found with ID: " + id));
+        tripRepository.delete(trip);
     }
 
     // ---- mapping helper ----
