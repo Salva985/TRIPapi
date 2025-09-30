@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 
 @Component
 @Profile("!test") // don’t run during tests
@@ -42,75 +43,69 @@ public class DataInitializer implements CommandLineRunner {
     @Transactional
     public void run(String... args) {
         // Avoid reseeding if already present
-        if (tripRepository.count() > 0 || destinationRepository.count() > 0) {
-            return;
-        }
+        if (tripRepository.count() > 0 || destinationRepository.count() > 0) return;
 
-        // ---- Destinations (ENUM CURRENCY) ----
+        // ---------------- Destinations ----------------
         Destination barcelona = Destination.builder()
-                .city("Barcelona")
-                .country("Spain")
-                .timezone("Europe/Madrid")
-                .currencyCode(CurrencyCode.EUR)
-                .build();
+                .city("Barcelona").country("Spain")
+                .timezone("Europe/Madrid").currencyCode(CurrencyCode.EUR).build();
 
         Destination rome = Destination.builder()
-                .city("Rome")
-                .country("Italy")
-                .timezone("Europe/Rome")
-                .currencyCode(CurrencyCode.EUR)
-                .build();
+                .city("Rome").country("Italy")
+                .timezone("Europe/Rome").currencyCode(CurrencyCode.EUR).build();
 
-        destinationRepository.save(barcelona);
-        destinationRepository.save(rome);
+        Destination london = Destination.builder()
+                .city("London").country("United Kingdom")
+                .timezone("Europe/London").currencyCode(CurrencyCode.GBP).build();
 
+        Destination newYork = Destination.builder()
+                .city("New York").country("USA")
+                .timezone("America/New_York").currencyCode(CurrencyCode.USD).build();
 
-        // ---- Trip (ENUM TRIP TYPE) ----
-        Trip summer = Trip.builder()
-                .name("Summer Escape")
+        destinationRepository.saveAll(List.of(barcelona, rome, london, newYork));
+
+        // ---------------- Trips (covering all TripType enums) ----------------
+        Trip leisureTrip = Trip.builder()
+                .name("Barcelona Summer Escape")
                 .startDate(LocalDate.of(2025, 7, 1))
                 .endDate(LocalDate.of(2025, 7, 10))
                 .destination(barcelona)
-                .tripType(TripType.LEISURE)       // <— enum
-                .notes("Family trip")
+                .tripType(TripType.LEISURE)
+                .notes("Family leisure trip in Spain")
                 .build();
 
-        Trip workTrip = Trip.builder()
+        Trip businessTrip = Trip.builder()
                 .name("Conference Rome")
                 .startDate(LocalDate.of(2025, 9, 5))
                 .endDate(LocalDate.of(2025, 9, 8))
                 .destination(rome)
                 .tripType(TripType.BUSINESS)
-                .notes("Tech conference")
+                .notes("Tech business trip")
                 .build();
 
-        tripRepository.save(summer);
-        tripRepository.save(workTrip);
-
-
-        // ---- Itinerary Days ----
-        ItineraryDay d1 = ItineraryDay.builder()
-                .trip(summer)
-                .date(LocalDate.of(2025, 7, 2))
-                .dayNumber(2)
-                .title("Old Town Walk")
-                .notes("Gothic Quarter + tapas")
+        Trip adventureTrip = Trip.builder()
+                .name("London Adventure Week")
+                .startDate(LocalDate.of(2025, 3, 10))
+                .endDate(LocalDate.of(2025, 3, 17))
+                .destination(london)
+                .tripType(TripType.ADVENTURE)
+                .notes("Sports and exploration")
                 .build();
 
-        ItineraryDay d2 = ItineraryDay.builder()
-                .trip(summer)
-                .date(LocalDate.of(2025, 7, 3))
-                .dayNumber(3)
-                .title("Beach Day")
-                .notes("Barceloneta in the morning")
+        Trip otherTrip = Trip.builder()
+                .name("NY Miscellaneous Trip")
+                .startDate(LocalDate.of(2025, 11, 20))
+                .endDate(LocalDate.of(2025, 11, 25))
+                .destination(newYork)
+                .tripType(TripType.OTHER)
+                .notes("Catch-all activities")
                 .build();
 
-        itineraryDayRepository.save(d1);
-        itineraryDayRepository.save(d2);
+        tripRepository.saveAll(List.of(leisureTrip, businessTrip, adventureTrip, otherTrip));
 
-        // ---- Budgets (ENUM CATEGORY & CURRENCY) ----
+        // ---------------- Budgets ----------------
         Budget flights = Budget.builder()
-                .trip(summer)
+                .trip(leisureTrip)
                 .category(BudgetCategory.TRANSPORT)
                 .plannedAmount(new BigDecimal("800.00"))
                 .spentAmount(new BigDecimal("760.45"))
@@ -119,51 +114,72 @@ public class DataInitializer implements CommandLineRunner {
                 .build();
 
         Budget food = Budget.builder()
-                .trip(summer)
+                .trip(leisureTrip)
                 .category(BudgetCategory.FOOD)
                 .plannedAmount(new BigDecimal("350.00"))
                 .spentAmount(new BigDecimal("90.00"))
                 .currencyCode(CurrencyCode.EUR)
-                .notes("Tapas + paella budget")
+                .notes("Tapas budget")
                 .build();
 
-        budgetRepository.save(flights);
-        budgetRepository.save(food);
+        budgetRepository.saveAll(List.of(flights, food));
 
-        // ---- Activities (build CONCRETE subclasses; base Activity is abstract) ----
+        // ---------------- Activities (covering all ActivityType enums) ----------------
+
+        // LEISURE trip (Barcelona) → SIGHTSEEING + CULTURAL
         ActivitySightseeing sagrada = ActivitySightseeing.builder()
-                .trip(summer)
-                .title("Sagrada Família Tour")
-                .date(LocalDate.of(2025, 7, 4))
-                .notes("Pre-book tickets")
-                .landmarkName("Sagrada Família")
-                .location("Barcelona")
-                .build();
+                .trip(leisureTrip).title("Sagrada Família Tour")
+                .date(LocalDate.of(2025, 7, 4)).notes("Pre-book tickets")
+                .landmarkName("Sagrada Família").location("Barcelona").build();
         sagrada.setType(ActivityType.SIGHTSEEING);
 
-        ActivityAdventure kayak = ActivityAdventure.builder()
-                .trip(summer)
-                .title("Kayak in Costa Brava")
-                .date(LocalDate.of(2025, 7, 6))
-                .notes("Bring sunscreen")
-                .difficultyLevel("LOW")
-                .equipmentRequired("Life vest")
-                .build();
-        kayak.setType(ActivityType.ADVENTURE);
-
         ActivityCultural opera = ActivityCultural.builder()
-                .trip(summer)
-                .date(LocalDate.of(2025, 7, 7))
-                .title("Opera Night")
-                .notes("Formal dress code recommended")
-                .type(ActivityType.CULTURAL)
-                .eventName("La Traviata")
-                .organizer("Palau Sant Jordi")
-                .build();
+                .trip(leisureTrip).date(LocalDate.of(2025, 7, 7))
+                .title("Opera Night").notes("Formal dress code")
+                .eventName("La Traviata").organizer("Gran Teatre del Liceu").build();
+        opera.setType(ActivityType.CULTURAL);
 
+        // BUSINESS trip (Rome) → CULTURAL + OTHER
+        ActivityCultural keynote = ActivityCultural.builder()
+                .trip(businessTrip).title("Conference Keynote")
+                .date(LocalDate.of(2025, 9, 6)).eventName("TechConf 2025")
+                .organizer("TechConf Org").notes("Arrive early").build();
+        keynote.setType(ActivityType.CULTURAL);
 
-        activityRepository.save(sagrada);
-        activityRepository.save(kayak);
-        activityRepository.save(opera);
+        Activity otherBusiness = new Activity();
+        otherBusiness.setTrip(businessTrip);
+        otherBusiness.setTitle("Networking Drinks");
+        otherBusiness.setDate(LocalDate.of(2025, 9, 7));
+        otherBusiness.setNotes("Evening casual event");
+        otherBusiness.setType(ActivityType.OTHER);
+
+        // ADVENTURE trip (London) → ADVENTURE + SIGHTSEEING
+        ActivityAdventure climbing = ActivityAdventure.builder()
+                .trip(adventureTrip).title("Climbing Gym Challenge")
+                .date(LocalDate.of(2025, 3, 12)).notes("Indoor climbing")
+                .difficultyLevel("MEDIUM").equipmentRequired("Shoes, chalk").build();
+        climbing.setType(ActivityType.ADVENTURE);
+
+        ActivitySightseeing tower = ActivitySightseeing.builder()
+                .trip(adventureTrip).title("Tower of London Visit")
+                .date(LocalDate.of(2025, 3, 14))
+                .landmarkName("Tower of London").location("London").build();
+        tower.setType(ActivityType.SIGHTSEEING);
+
+        // OTHER trip (NY) → OTHER + ADVENTURE
+        Activity otherNy = new Activity();
+        otherNy.setTrip(otherTrip);
+        otherNy.setTitle("Central Park Picnic");
+        otherNy.setDate(LocalDate.of(2025, 11, 21));
+        otherNy.setNotes("Weather permitting");
+        otherNy.setType(ActivityType.OTHER);
+
+        ActivityAdventure surf = ActivityAdventure.builder()
+                .trip(otherTrip).title("Hudson River Kayak")
+                .date(LocalDate.of(2025, 11, 23))
+                .difficultyLevel("BEGINNER").equipmentRequired("Life vest").build();
+        surf.setType(ActivityType.ADVENTURE);
+
+        activityRepository.saveAll(List.of(sagrada, opera, keynote, otherBusiness, climbing, tower, otherNy, surf));
     }
 }
