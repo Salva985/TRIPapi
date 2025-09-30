@@ -9,12 +9,12 @@ import org.springframework.data.repository.query.Param;
 
 public interface ActivityRepository extends JpaRepository<Activity, Long> {
     @Query("""
-     SELECT a FROM Activity a
-     WHERE (:q IS NULL OR
-            LOWER(a.title) LIKE LOWER(CONCAT('%', :q, '%')) OR
-            LOWER(COALESCE(a.notes, '')) LIKE LOWER(CONCAT('%', :q, '%')) OR
-            LOWER(CAST(a.type as string)) LIKE LOWER(CONCAT('%', :q, '%'))
-     )
-  """)
-    Page<Activity> search(@Param("q") String query, Pageable pageable);
+        SELECT a FROM Activity a
+        LEFT JOIN a.trip t
+        WHERE (:q IS NULL
+            OR LOWER(a.title) LIKE LOWER(CONCAT('%', :q, '%'))
+            OR LOWER(CAST(a.type AS string)) LIKE LOWER(CONCAT('%', :q, '%'))
+            OR LOWER(t.name) LIKE LOWER(CONCAT('%', :q, '%')))
+    """)
+    Page<Activity> search(@Param("q") String q, Pageable pageable);
 }

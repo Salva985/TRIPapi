@@ -17,7 +17,6 @@ import com.tripapi.dto.common.PagedResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 
 import java.util.List;
 
@@ -107,19 +106,22 @@ public class ActivityServiceImpl implements ActivityService {
     @Override
     public PagedResponse<ActivityResponseDTO> findAll(String search, int page, int pageSize) {
         Pageable pageable = PageRequest.of(Math.max(page - 1, 0), Math.max(pageSize, 1));
-        String q = (search == null) ? "" : search.trim();
+        String q = (search == null || search.isBlank()) ? null : search.trim();
 
+        // Query DB
         Page<Activity> pageResult = activityRepository.search(q, pageable);
 
+        // Map entities -> DTOs
         List<ActivityResponseDTO> items = pageResult.getContent()
                 .stream()
                 .map(this::toDTO)
                 .toList();
 
+        // 1-based page in the meta for the client
         return new PagedResponse<>(
                 items,
                 new PagedResponse.Meta(
-                        page,                      // 1-based page for the client
+                        page,
                         pageSize,
                         pageResult.getTotalElements()
                 )
