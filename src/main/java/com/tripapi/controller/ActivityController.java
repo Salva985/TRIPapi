@@ -2,6 +2,7 @@ package com.tripapi.controller;
 
 import com.tripapi.dto.Activity.ActivityResponseDTO;
 import com.tripapi.dto.Activity.ActivityRequestDTO;
+import com.tripapi.dto.common.PagedResponse;
 import com.tripapi.service.interfaces.ActivityService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,9 +20,18 @@ public class ActivityController {
     @Autowired
     private ActivityService activityService;
 
-    @GetMapping
+    /*@GetMapping
     public List<ActivityResponseDTO> findAll() {
         return activityService.findAll();
+    }*/
+
+    @GetMapping
+    public PagedResponse<ActivityResponseDTO> findAll(
+            @RequestParam(required = false) String search,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int pageSize
+    ) {
+        return activityService.findAll(search, page, pageSize);
     }
 
     @GetMapping("/{id}")

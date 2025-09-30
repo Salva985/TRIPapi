@@ -13,6 +13,11 @@ import com.tripapi.repository.TripRepository;
 import com.tripapi.service.interfaces.ActivityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import com.tripapi.dto.common.PagedResponse;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 import java.util.List;
 
@@ -97,6 +102,28 @@ public class ActivityServiceImpl implements ActivityService {
             throw new ResourceNotFoundException("Activity not found with ID: " + id);
         }
         activityRepository.deleteById(id);
+    }
+
+    @Override
+    public PagedResponse<ActivityResponseDTO> findAll(String search, int page, int pageSize) {
+        Pageable pageable = PageRequest.of(Math.max(page - 1, 0), Math.max(pageSize, 1));
+        String q = (search == null) ? "" : search.trim();
+
+        Page<Activity> pageResult = activityRepository.search(q, pageable);
+
+        List<ActivityResponseDTO> items = pageResult.getContent()
+                .stream()
+                .map(this::toDTO)
+                .toList();
+
+        return new PagedResponse<>(
+                items,
+                new PagedResponse.Meta(
+                        page,                      // 1-based page for the client
+                        pageSize,
+                        pageResult.getTotalElements()
+                )
+        );
     }
 
     // -------- helpers --------
