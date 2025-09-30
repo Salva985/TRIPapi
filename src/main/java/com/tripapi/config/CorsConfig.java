@@ -13,10 +13,16 @@ public class CorsConfig {
         return new WebMvcConfigurer() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/**")
-                        .allowedOrigins("http://localhost:5173","http://localhost:5174","http://localhost:5175") // React dev server
-                        .allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
-                        .allowedHeaders("*");
+                registry.addMapping("/api/**")
+                        .allowedOrigins(
+                                "http://localhost:5173",
+                                "http://localhost:5174",
+                                "http://localhost:5175"
+                        )
+                        .allowedMethods("GET","POST","PUT","PATCH","DELETE","OPTIONS")
+                        .allowedHeaders("*")
+                        .exposedHeaders("Authorization")  // front-end can read the token header if ever send it
+                        .allowCredentials(true);          // if to use cookies
             }
         };
     }

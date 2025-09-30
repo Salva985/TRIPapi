@@ -8,6 +8,7 @@ import com.tripapi.model.*;
 import com.tripapi.repository.*;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,24 +26,43 @@ public class DataInitializer implements CommandLineRunner {
     private final BudgetRepository budgetRepository;
     private final ActivityRepository activityRepository;
 
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+
     public DataInitializer(
             DestinationRepository destinationRepository,
             TripRepository tripRepository,
             ItineraryDayRepository itineraryDayRepository,
             BudgetRepository budgetRepository,
-            ActivityRepository activityRepository
+            ActivityRepository activityRepository,
+            UserRepository userRepository,
+            PasswordEncoder passwordEncoder
     ) {
         this.destinationRepository = destinationRepository;
         this.tripRepository = tripRepository;
         this.itineraryDayRepository = itineraryDayRepository;
         this.budgetRepository = budgetRepository;
         this.activityRepository = activityRepository;
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
     @Transactional
     public void run(String... args) {
-        // Avoid reseeding if already present
+
+        // ---------- USER Demo  ----------
+        if (userRepository.count() == 0) {
+            User demo = User.builder()
+                    .username("Sal")
+                    .fullName("Salvatore Marchese")
+                    .email("salva@example.com")
+                    .passwordHash(passwordEncoder.encode("secret123"))
+                    .dob(LocalDate.of(1995, 3, 20))
+                    .build();
+            userRepository.save(demo);
+        }
+
         if (tripRepository.count() > 0 || destinationRepository.count() > 0) return;
 
         // ---------------- Destinations ----------------
