@@ -3,13 +3,10 @@ package com.tripapi.service.impl;
 import com.tripapi.dto.Activity.ActivityRequestDTO;
 import com.tripapi.dto.Activity.ActivityResponseDTO;
 import com.tripapi.enums.ActivityType;
-import com.tripapi.model.Activity;
-import com.tripapi.model.ActivityAdventure;
-import com.tripapi.model.ActivityCultural;
-import com.tripapi.model.ActivitySightseeing;
-import com.tripapi.model.Trip;
+import com.tripapi.model.*;
 import com.tripapi.repository.ActivityRepository;
 import com.tripapi.repository.TripRepository;
+import com.tripapi.security.CurrentUser;
 import com.tripapi.service.interfaces.ActivityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,6 +26,9 @@ public class ActivityServiceImpl implements ActivityService {
     @Autowired
     private TripRepository tripRepository;
 
+    @Autowired
+    private CurrentUser currentUser;
+
     @Override
     public List<ActivityResponseDTO> findAll() {
         return activityRepository.findAll()
@@ -39,14 +39,17 @@ public class ActivityServiceImpl implements ActivityService {
 
     @Override
     public ActivityResponseDTO findById(Long id) {
-        Activity a = activityRepository.findById(id)
+        User me = currentUser.require();
+        Activity a = activityRepository.findByIdAndOwner(id, me.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("Activity not found with ID: " + id));
         return toDTO(a);
     }
 
     @Override
     public ActivityResponseDTO create(ActivityRequestDTO dto) {
+        User me = currentUser.require();
         Trip tripRef = tripRepository.findById(dto.getTripId())
+                .filter(t -> t.getOwner() != null && t.getOwner().getId().equals(me.getId()))
                 .orElseThrow(() -> new ResourceNotFoundException("Trip not found with ID: " + dto.getTripId()));
 
         ActivityType type = dto.getType();
@@ -71,7 +74,8 @@ public class ActivityServiceImpl implements ActivityService {
 
     @Override
     public ActivityResponseDTO update(Long id, ActivityRequestDTO dto) {
-        Activity a = activityRepository.findById(id)
+        User me = currentUser.require();
+        Activity a = activityRepository.findByIdAndOwner(id, me.getId()) // 👈
                 .orElseThrow(() -> new ResourceNotFoundException("Activity not found with ID: " + id));
 
         // keep subtype stable (don’t allow changing type)
@@ -81,6 +85,7 @@ public class ActivityServiceImpl implements ActivityService {
         }
 
         Trip tripRef = tripRepository.findById(dto.getTripId())
+                .filter(t -> t.getOwner() != null && t.getOwner().getId().equals(me.getId())) // 👈
                 .orElseThrow(() -> new ResourceNotFoundException("Trip not found with ID: " + dto.getTripId()));
 
         // common fields
@@ -97,19 +102,20 @@ public class ActivityServiceImpl implements ActivityService {
 
     @Override
     public void delete(Long id) {
-        if (!activityRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Activity not found with ID: " + id);
-        }
+        User me = currentUser.require(); // 👈
+        Activity a = activityRepository.findByIdAndOwner(id, me.getId()) // 👈
+                .orElseThrow(() -> new ResourceNotFoundException("Activity not found with ID: " + id));
         activityRepository.deleteById(id);
     }
 
     @Override
     public PagedResponse<ActivityResponseDTO> findAll(String search, int page, int pageSize) {
+        User me = currentUser.require();
         Pageable pageable = PageRequest.of(Math.max(page - 1, 0), Math.max(pageSize, 1));
         String q = (search == null || search.isBlank()) ? null : search.trim();
 
         // Query DB
-        Page<Activity> pageResult = activityRepository.search(q, pageable);
+        Page<Activity> pageResult = activityRepository.search(q, me.getId(), pageable);
 
         // Map entities -> DTOs
         List<ActivityResponseDTO> items = pageResult.getContent()

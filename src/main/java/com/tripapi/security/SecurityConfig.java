@@ -6,29 +6,39 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
-@EnableWebSecurity
-@Order(SecurityProperties.BASIC_AUTH_ORDER) // ensure this chain is used
+@Order(SecurityProperties.BASIC_AUTH_ORDER)
 public class SecurityConfig {
+
+    private final JwtAuthFilter jwtAuthFilter;
+
+    public SecurityConfig(JwtAuthFilter jwtAuthFilter) {
+        this.jwtAuthFilter = jwtAuthFilter;
+    }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+                // must use our CorsConfigurationSource bean
                 .cors(Customizer.withDefaults())
                 .csrf(csrf -> csrf.disable())
-                // Stateless (JWT-ready)
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                // Authorization
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/**").permitAll()
-                );
+                        // let preflight pass
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                        // public endpoints
+                        .requestMatchers("/api/health", "/api/auth/**").permitAll()
+                        // everything else needs JWT
+                        .anyRequest().authenticated()
+                )
+                // make sure the JWT filter runs before UsernamePasswordAuthenticationFilter
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
-        // no httpBasic(), no formLogin() for pure API
         return http.build();
     }
 }
