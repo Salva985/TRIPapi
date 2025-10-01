@@ -48,6 +48,12 @@ public class Trip {
     @Column(length = 500)
     private String notes;
 
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @JoinColumn(name = "owner_id", nullable = false, updatable = false)
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    private User owner;
+
     @OneToMany(
             mappedBy = "trip",
             cascade = CascadeType.ALL,      // propagate REMOVE to children

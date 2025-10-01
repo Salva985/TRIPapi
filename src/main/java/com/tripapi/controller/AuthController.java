@@ -47,7 +47,7 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest req) {
-        User u = userRepository.findByEmail(req.getEmail())
+        User u = userRepository.findByEmailIgnoreCase(req.getEmail())
                 .orElse(null);
         if (u == null || !passwordEncoder.matches(req.getPassword(), u.getPasswordHash())) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");

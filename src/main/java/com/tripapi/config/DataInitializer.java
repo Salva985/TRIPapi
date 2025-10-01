@@ -52,15 +52,19 @@ public class DataInitializer implements CommandLineRunner {
     public void run(String... args) {
 
         // ---------- USER Demo  ----------
+        User demo;
         if (userRepository.count() == 0) {
-            User demo = User.builder()
+            demo = User.builder()
                     .username("Sal")
                     .fullName("Salvatore Marchese")
                     .email("salva@example.com")
                     .passwordHash(passwordEncoder.encode("secret123"))
                     .dob(LocalDate.of(1995, 3, 20))
                     .build();
-            userRepository.save(demo);
+            demo = userRepository.save(demo);
+        } else {
+            demo = userRepository.findByEmailIgnoreCase("salva@example.com")
+                    .orElseThrow();
         }
 
         if (tripRepository.count() > 0 || destinationRepository.count() > 0) return;
@@ -92,6 +96,7 @@ public class DataInitializer implements CommandLineRunner {
                 .destination(barcelona)
                 .tripType(TripType.LEISURE)
                 .notes("Family leisure trip in Spain")
+                .owner(demo)
                 .build();
 
         Trip businessTrip = Trip.builder()
@@ -101,6 +106,7 @@ public class DataInitializer implements CommandLineRunner {
                 .destination(rome)
                 .tripType(TripType.BUSINESS)
                 .notes("Tech business trip")
+                .owner(demo)
                 .build();
 
         Trip adventureTrip = Trip.builder()
@@ -110,6 +116,7 @@ public class DataInitializer implements CommandLineRunner {
                 .destination(london)
                 .tripType(TripType.ADVENTURE)
                 .notes("Sports and exploration")
+                .owner(demo)
                 .build();
 
         Trip otherTrip = Trip.builder()
@@ -119,6 +126,7 @@ public class DataInitializer implements CommandLineRunner {
                 .destination(newYork)
                 .tripType(TripType.OTHER)
                 .notes("Catch-all activities")
+                .owner(demo)
                 .build();
 
         tripRepository.saveAll(List.of(leisureTrip, businessTrip, adventureTrip, otherTrip));

@@ -1,5 +1,6 @@
 package com.tripapi.security;
 
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
@@ -13,14 +14,18 @@ import java.util.Date;
 @Component
 public class JwtUtil {
 
-    @Value("${app.jwt.secret}")
-    private String secret;
+    private final SecretKey key;
+    private final long expirationMs;
 
-    @Value("${app.jwt.expiration-ms:604800000}") // default 7 days
-    private long expirationMs;
-
-    private SecretKey key() {
-        return Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
+    public JwtUtil(
+            @Value("${app.jwt.secret}") String secret,
+            @Value("${app.jwt.expiration-ms:604800000}") long expirationMs
+    ) {
+        if (secret.length() < 32) {
+            throw new IllegalArgumentException("JWT secret must be at least 32 chars for HS256");
+        }
+        this.key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
+        this.expirationMs = expirationMs;
     }
 
     public String generateToken(String subject) {
@@ -31,16 +36,24 @@ public class JwtUtil {
                 .setSubject(subject)
                 .setIssuedAt(now)
                 .setExpiration(exp)
-                .signWith(key(), SignatureAlgorithm.HS256)
+                .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
     }
 
-    public String getSubject(String token) {
+    public String extractSubject(String token) {
+        return parseAllClaims(token).getSubject();
+    }
+
+    public boolean isValid(String token, String expectedSubject) {
+        Claims c = parseAllClaims(token);
+        return expectedSubject.equalsIgnoreCase(c.getSubject()) && c.getExpiration().after(new Date());
+    }
+
+    private Claims parseAllClaims(String token) {
         return Jwts.parserBuilder()
-                .setSigningKey(key())
+                .setSigningKey(key)
                 .build()
                 .parseClaimsJws(token)
-                .getBody()
-                .getSubject();
+                .getBody();
     }
 }
